@@ -24,7 +24,7 @@ class Data
     protected DestroyService $destroyService;
 
     public function __construct(
-        string $apiUrl = 'https://sourceoftruth.tech'
+        string $apiUrl = 'https://sourceoftruth.tech/api'
     ) {
         $this->httpClient = new Client();
         $this->apiUrl = rtrim($apiUrl, '/');
@@ -75,7 +75,7 @@ class Data
         $decodedKey = base64_decode($existingKey, true);
         if (
             $decodedKey === false
-            || strlen($decodedKey) !== 32
+            || mb_strlen($decodedKey, '8bit') !== 32
         ) {
             return [
                 'success' => false,
