@@ -1,0 +1,25 @@
+{
+    "name": "sot/crypt",
+    "description": "The goto service for true zero visibility data storage and consolidation",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hussey Coding Limited",
+            "email": "info@husseycoding.co.uk"
+        }
+    ],
+    "homepage": "https://sourceoftruth.tech",
+    "require": {
+        "php": "^8.2",
+        "ext-openssl": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sot\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
