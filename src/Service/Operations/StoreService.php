@@ -22,7 +22,7 @@ class StoreService
 
     public function execute(
         string $key,
-        string $value,
+        $value,
         callable $encryptCallback
     ): array {
         $token = getenv('SOT_INT_TOKEN');
@@ -47,7 +47,8 @@ class StoreService
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'
-                ]
+                ],
+                'http_errors' => false
             ]);
 
             $statusCode = $response->getStatusCode();

@@ -22,8 +22,9 @@ class UpdateService
 
     public function execute(
         string $key,
-        string $value,
-        callable $encryptCallback
+        $value,
+        bool $isPartialUpdate = false,
+        callable $encryptCallback = null
     ): array {
         $token = getenv('SOT_INT_TOKEN');
         if ($token === false || empty($token)) {
@@ -36,18 +37,25 @@ class UpdateService
         }
 
         try {
-            $encryptedValue = $encryptCallback($value);
+            // Value is already encrypted, no need for callback
+            $requestData = ['key' => $key];
+            
+            if ($isPartialUpdate) {
+                // Partial update with attributes
+                $requestData['attributes'] = $value;
+            } else {
+                // Full value update
+                $requestData['value'] = $value;
+            }
             
             $response = $this->httpClient->put($this->apiUrl . '/update', [
-                'json' => [
-                    'key' => $key,
-                    'value' => $encryptedValue
-                ],
+                'json' => $requestData,
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'
-                ]
+                ],
+                'http_errors' => false
             ]);
 
             $statusCode = $response->getStatusCode();
@@ -73,13 +81,6 @@ class UpdateService
                 'code' => $e->getCode(),
                 'success' => false,
                 'error' => $e->getMessage(),
-                'value' => ''
-            ];
-        } catch (\Exception $e) {
-            return [
-                'code' => 0,
-                'success' => false,
-                'error' => 'Encryption failed: ' . $e->getMessage(),
                 'value' => ''
             ];
         }

@@ -22,6 +22,7 @@ class ShowService
 
     public function execute(
         string $key,
+        ?string $attribute,
         string $encryptionKey,
         callable $decryptCallback
     ): array {
@@ -36,11 +37,17 @@ class ShowService
         }
 
         try {
-            $response = $this->httpClient->get($this->apiUrl . '/show/' . urlencode($key), [
+            $url = $this->apiUrl . '/show/' . urlencode($key);
+            if ($attribute !== null) {
+                $url .= '?attribute=' . urlencode($attribute);
+            }
+            
+            $response = $this->httpClient->get($url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Accept' => 'application/json'
-                ]
+                ],
+                'http_errors' => false
             ]);
 
             $statusCode = $response->getStatusCode();

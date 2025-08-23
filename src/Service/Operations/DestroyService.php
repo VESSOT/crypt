@@ -21,7 +21,8 @@ class DestroyService
     }
 
     public function execute(
-        string $key
+        string $key,
+        $attributes = null
     ): array {
         $token = getenv('SOT_INT_TOKEN');
         if ($token === false || empty($token)) {
@@ -34,15 +35,19 @@ class DestroyService
         }
 
         try {
+            $requestData = ['key' => $key];
+            if ($attributes !== null) {
+                $requestData['attributes'] = $attributes;
+            }
+            
             $response = $this->httpClient->delete($this->apiUrl . '/destroy', [
-                'json' => [
-                    'key' => $key
-                ],
+                'json' => $requestData,
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'
-                ]
+                ],
+                'http_errors' => false
             ]);
 
             $statusCode = $response->getStatusCode();

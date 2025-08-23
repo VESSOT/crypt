@@ -89,7 +89,8 @@ class Data
     }
 
     public function show(
-        string $key
+        string $key,
+        ?string $attribute = null
     ): array {
         $keyResult = $this->loadEncryptionKey();
         if (!$keyResult['success']) {
@@ -103,14 +104,15 @@ class Data
 
         return $this->showService->execute(
             $key,
+            $attribute,
             $this->encryptionKey,
-            fn($data) => $this->decrypt($data)
+            fn($data) => $this->smartDecrypt($data)
         );
     }
 
     public function store(
         string $key,
-        string $value
+        $value
     ): array {
         $keyResult = $this->loadEncryptionKey();
         if (!$keyResult['success']) {
@@ -122,16 +124,20 @@ class Data
             ];
         }
 
+        // Recursively encrypt individual values while preserving structure
+        $encryptedValue = $this->encryptRecursively($value);
+
         return $this->storeService->execute(
             $key,
-            $value,
-            fn($data) => $this->encrypt($data)
+            $encryptedValue,
+            fn($data) => $data // Data is already encrypted
         );
     }
 
     public function update(
         string $key,
-        string $value
+        $value = null,
+        ?array $attributes = null
     ): array {
         $keyResult = $this->loadEncryptionKey();
         if (!$keyResult['success']) {
@@ -143,17 +149,31 @@ class Data
             ];
         }
 
+        // Determine what to update
+        if ($attributes !== null) {
+            // Partial attribute update - merge attributes into existing structure
+            $valueToUpdate = $attributes;
+        } else {
+            // Full value update
+            $valueToUpdate = $value;
+        }
+
+        // Always use recursive encryption like store() does
+        $encryptedValue = $this->encryptRecursively($valueToUpdate);
+
         return $this->updateService->execute(
             $key,
-            $value,
-            fn($data) => $this->encrypt($data)
+            $encryptedValue,
+            $attributes !== null, // Pass flag to indicate if this is partial update
+            fn($data) => $data // Data is already encrypted
         );
     }
 
     public function destroy(
-        string $key
+        string $key,
+        $attributes = null
     ): array {
-        return $this->destroyService->execute($key);
+        return $this->destroyService->execute($key, $attributes);
     }
 
     protected function encrypt(
@@ -230,5 +250,73 @@ class Data
         }
 
         return $decryptedPlaintext;
+    }
+
+    protected function encryptRecursively($data)
+    {
+        if (is_array($data)) {
+            $encrypted = [];
+            foreach ($data as $key => $value) {
+                $encrypted[$key] = $this->encryptRecursively($value);
+            }
+            return $encrypted;
+        } elseif (is_object($data)) {
+            $encrypted = new \stdClass();
+            foreach ($data as $key => $value) {
+                $encrypted->$key = $this->encryptRecursively($value);
+            }
+            return $encrypted;
+        } else {
+            // Encrypt scalar values (string, int, bool, etc.)
+            $valueToEncrypt = is_string($data) ? $data : json_encode($data);
+            return $this->encrypt($valueToEncrypt);
+        }
+    }
+
+    protected function smartDecrypt($data)
+    {
+        // If data is an array or object, we need recursive decryption (nested object/array returned)
+        if (is_array($data) || is_object($data)) {
+            return $this->decryptRecursively($data);
+        } else {
+            // Single value returned - decrypt it directly
+            try {
+                $decryptedValue = $this->decrypt($data);
+                // Try to decode as JSON in case it's a JSON-encoded value
+                $jsonDecoded = json_decode($decryptedValue, true);
+                return ($jsonDecoded !== null && json_last_error() === JSON_ERROR_NONE) ? $jsonDecoded : $decryptedValue;
+            } catch (\Exception $e) {
+                // If decryption fails, return original value
+                return $data;
+            }
+        }
+    }
+
+    protected function decryptRecursively($data)
+    {
+        if (is_array($data)) {
+            $decrypted = [];
+            foreach ($data as $key => $value) {
+                $decrypted[$key] = $this->decryptRecursively($value);
+            }
+            return $decrypted;
+        } elseif (is_object($data)) {
+            $decrypted = new \stdClass();
+            foreach ($data as $key => $value) {
+                $decrypted->$key = $this->decryptRecursively($value);
+            }
+            return $decrypted;
+        } else {
+            // Decrypt scalar values directly - no guessing needed
+            try {
+                $decryptedValue = $this->decrypt($data);
+                // Try to decode as JSON, if it fails return as string
+                $jsonDecoded = json_decode($decryptedValue, true);
+                return ($jsonDecoded !== null && json_last_error() === JSON_ERROR_NONE) ? $jsonDecoded : $decryptedValue;
+            } catch (\Exception $e) {
+                // If decryption fails, return original value
+                return $data;
+            }
+        }
     }
 }
