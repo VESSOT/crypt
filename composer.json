@@ -1,15 +1,15 @@
 {
-    "name": "sot/crypt",
+    "name": "vessot/crypt",
     "description": "The goto service for true zero visibility data storage and consolidation",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Hussey Coding Limited",
-            "email": "info@husseycoding.co.uk"
+            "name": "VESSOT",
+            "email": "hello@vessot.tech"
         }
     ],
-    "homepage": "https://sourceoftruth.tech",
+    "homepage": "https://vessot.tech",
     "require": {
         "php": "^8.2",
         "ext-openssl": "*",
