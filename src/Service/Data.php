@@ -24,7 +24,7 @@ class Data
     protected DestroyService $destroyService;
 
     public function __construct(
-        string $apiUrl = 'https://sourceoftruth.tech/api'
+        string $apiUrl = 'https://vessot.tech/api'
     ) {
         $this->httpClient = new Client();
         $this->apiUrl = rtrim($apiUrl, '/');
