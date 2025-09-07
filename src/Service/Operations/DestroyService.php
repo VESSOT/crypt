@@ -24,12 +24,12 @@ class DestroyService
         string $key,
         $attributes = null
     ): array {
-        $token = getenv('SOT_INT_TOKEN');
+        $token = getenv('VESSOT_INT_TOKEN');
         if ($token === false || empty($token)) {
             return [
                 'code' => 0,
                 'success' => false,
-                'error' => 'SOT_INT_TOKEN environment variable not set',
+                'error' => 'VESSOT_INT_TOKEN environment variable not set',
                 'value' => ''
             ];
         }

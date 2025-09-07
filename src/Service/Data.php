@@ -48,7 +48,7 @@ class Data
 
     public function cryptKeyGenerate(): string
     {
-        $existingKey = getenv('SOT_CRYPT_KEY');
+        $existingKey = getenv('VESSOT_CRYPT_KEY');
         if (
             $existingKey !== false
             && !empty($existingKey)
@@ -61,14 +61,14 @@ class Data
 
     protected function loadEncryptionKey(): array
     {
-        $existingKey = getenv('SOT_CRYPT_KEY');
+        $existingKey = getenv('VESSOT_CRYPT_KEY');
         if (
             $existingKey === false
             || empty($existingKey)
         ) {
             return [
                 'success' => false,
-                'error' => 'SOT_CRYPT_KEY environment variable not set'
+                'error' => 'VESSOT_CRYPT_KEY environment variable not set'
             ];
         }
         
@@ -79,7 +79,7 @@ class Data
         ) {
             return [
                 'success' => false,
-                'error' => 'SOT_CRYPT_KEY must be a valid base64-encoded 32-byte key'
+                'error' => 'VESSOT_CRYPT_KEY must be a valid base64-encoded 32-byte key'
             ];
         }
         
