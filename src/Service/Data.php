@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Sot\Service;
+namespace Vessot\Service;
 
 use GuzzleHttp\Client;
-use Sot\Service\Operations\ShowService;
-use Sot\Service\Operations\StoreService;
-use Sot\Service\Operations\UpdateService;
-use Sot\Service\Operations\DestroyService;
+use Vessot\Service\Operations\ShowService;
+use Vessot\Service\Operations\StoreService;
+use Vessot\Service\Operations\UpdateService;
+use Vessot\Service\Operations\DestroyService;
 
 class Data
 {

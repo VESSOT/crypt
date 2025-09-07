@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Sot\Service\Operations;
+namespace Vessot\Service\Operations;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
