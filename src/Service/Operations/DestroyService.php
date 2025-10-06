@@ -25,6 +25,9 @@ class DestroyService
         $attributes = null
     ): array {
         $token = getenv('VESSOT_INT_TOKEN');
+        if (empty($token)) {
+            $token = $_SERVER['VESSOT_INT_TOKEN'];
+        }
         if ($token === false || empty($token)) {
             return [
                 'code' => 0,

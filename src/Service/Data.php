@@ -49,6 +49,9 @@ class Data
     public function cryptKeyGenerate(): string
     {
         $existingKey = getenv('VESSOT_CRYPT_KEY');
+        if (empty($existingKey)) {
+            $existingKey = $_SERVER['VESSOT_CRYPT_KEY'];
+        }
         if (
             $existingKey !== false
             && !empty($existingKey)
@@ -62,6 +65,9 @@ class Data
     protected function loadEncryptionKey(): array
     {
         $existingKey = getenv('VESSOT_CRYPT_KEY');
+        if (empty($existingKey)) {
+            $existingKey = $_SERVER['VESSOT_CRYPT_KEY'];
+        }
         if (
             $existingKey === false
             || empty($existingKey)
